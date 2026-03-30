@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kader Babaro — Développeur Full-Stack</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #16161f;
+    --gold: #c9a96e;
+    --gold-light: #e8c98a;
+    --gold-dim: rgba(201,169,110,0.15);
+    --text: #e8e4dc;
+    --text-muted: #7a7670;
+    --text-dim: #4a4845;
+    --border: rgba(201,169,110,0.12);
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-serif); font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; opacity: 0.5; }
+  .cursor { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); transition: width .2s, height .2s; }
+  .cursor-ring { width: 32px; height: 32px; border: 1px solid rgba(201,169,110,0.5); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); }
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.5rem 4rem; background: linear-gradient(to bottom, rgba(10,10,15,0.95), transparent); backdrop-filter: blur(4px); }
+  .nav-logo { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; letter-spacing: 0.15em; color: var(--gold); text-decoration: none; }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); text-decoration: none; transition: color .3s; }
+  .nav-links a:hover { color: var(--gold); }
+  #hero { min-height: 100vh; display: flex; align-items: center; padding: 0 4rem; position: relative; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 70% 50%, rgba(201,169,110,0.06) 0%, transparent 70%), radial-gradient(ellipse 30% 60% at 20% 80%, rgba(80,60,120,0.08) 0%, transparent 60%); }
+  .hero-line { position: absolute; left: 4rem; top: 0; bottom: 0; width: 1px; background: linear-gradient(to bottom, transparent, var(--gold) 30%, var(--gold) 70%, transparent); opacity: 0.2; }
+  .hero-content { position: relative; max-width: 800px; padding-left: 3rem; }
+  .hero-eyebrow { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; opacity: 0; animation: fadeUp .8s .2s forwards; }
+  .hero-name { font-size: clamp(3.5rem, 8vw, 7rem); font-weight: 300; line-height: 1; letter-spacing: -0.02em; margin-bottom: 0.5rem; opacity: 0; animation: fadeUp .8s .4s forwards; }
+  .hero-name em { font-style: italic; color: var(--gold-light); }
+  .hero-title { font-size: clamp(1rem, 2vw, 1.3rem); font-weight: 300; color: var(--text-muted); margin-bottom: 2.5rem; letter-spacing: 0.04em; opacity: 0; animation: fadeUp .8s .6s forwards; }
+  .hero-desc { font-size: 1.05rem; color: var(--text-muted); max-width: 500px; margin-bottom: 3rem; line-height: 1.8; opacity: 0; animation: fadeUp .8s .8s forwards; }
+  .hero-cta { display: flex; gap: 1.5rem; align-items: center; opacity: 0; animation: fadeUp .8s 1s forwards; }
+  .btn-primary { padding: .75rem 2rem; border: 1px solid var(--gold); color: var(--gold); font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; background: transparent; cursor: pointer; position: relative; overflow: hidden; }
+  .btn-primary::before { content: ''; position: absolute; inset: 0; background: var(--gold); transform: translateX(-101%); transition: transform .3s cubic-bezier(.4,0,.2,1); }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .btn-primary span { position: relative; }
+  .btn-primary:hover span { color: var(--bg); }
+  .hero-scroll { display: flex; align-items: center; gap: 1rem; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; color: var(--text-dim); text-decoration: none; }
+  .scroll-line { width: 40px; height: 1px; background: var(--text-dim); transition: width .3s; }
+  .hero-scroll:hover .scroll-line { width: 60px; background: var(--gold); }
+  section { padding: 7rem 4rem; }
+  .section-header { display: flex; align-items: center; gap: 2rem; margin-bottom: 5rem; }
+  .section-num { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.1em; opacity: 0.7; }
+  .section-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 300; letter-spacing: -0.01em; }
+  .section-title em { font-style: italic; color: var(--gold-light); }
+  .section-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--border), transparent); }
+
+  /* ABOUT */
+  #about { background: var(--surface); }
+  .about-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 6rem; align-items: start; }
+  .about-visual { position: relative; }
+  .about-frame { width: 100%; aspect-ratio: 3/4; border: 1px solid var(--border); background: var(--surface2); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .about-frame-initials { font-size: 8rem; font-style: italic; color: rgba(201,169,110,0.12); font-family: var(--font-serif); }
+  .about-corner { position: absolute; width: 20px; height: 20px; border-color: var(--gold); border-style: solid; opacity: 0.6; z-index: 1; }
+  .about-corner.tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .about-corner.br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+  .about-badge { position: absolute; bottom: -1.5rem; right: -1.5rem; background: var(--bg); border: 1px solid var(--border); padding: 1rem 1.5rem; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; color: var(--text-muted); }
+  .about-badge span { display: block; font-size: 1.4rem; font-family: var(--font-serif); color: var(--gold); font-weight: 400; }
+  .about-text { padding-top: 1rem; }
+  .about-text p { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1.05rem; }
+  .about-info { display: flex; flex-direction: column; gap: .6rem; margin-top: 2rem; }
+  .about-info-row { display: flex; align-items: center; gap: 1rem; font-family: var(--font-mono); font-size: 0.72rem; }
+  .about-info-label { color: var(--text-dim); letter-spacing: 0.08em; min-width: 90px; }
+  .about-info-val { color: var(--text-muted); }
+  .about-info-val a { color: var(--gold); text-decoration: none; }
+  .about-info-val a:hover { text-decoration: underline; }
+  .about-tags { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2.5rem; }
+  .tag { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--border); padding: .35rem .9rem; transition: border-color .3s, background .3s; }
+  .tag:hover { border-color: var(--gold); background: var(--gold-dim); }
+
+  /* EXPERIENCE */
+  #experience { background: var(--bg); }
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: grid; grid-template-columns: 200px 1fr; gap: 3rem; padding: 2.5rem 0; border-top: 1px solid var(--border); position: relative; }
+  .timeline-item:last-child { border-bottom: 1px solid var(--border); }
+  .timeline-item::after { content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 1px; background: var(--gold); transition: width .5s cubic-bezier(.4,0,.2,1); }
+  .timeline-item:hover::after { width: 100%; }
+  .timeline-period { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.08em; margin-bottom: .5rem; }
+  .timeline-company { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0.06em; }
+  .timeline-role { font-size: 1.3rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: -0.01em; }
+  .timeline-role em { font-style: italic; color: var(--gold-light); }
+  .timeline-list { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+  .timeline-list li { color: var(--text-muted); font-size: 0.95rem; display: flex; align-items: flex-start; gap: .75rem; }
+  .timeline-list li::before { content: ''; width: 4px; height: 4px; background: var(--gold); border-radius: 50%; opacity: 0.6; flex-shrink: 0; margin-top: .65rem; }
+
+  /* FORMATION */
+  #formation { background: var(--surface); }
+  .formation-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .formation-card { background: var(--surface); padding: 2.5rem; transition: background .3s; }
+  .formation-card:hover { background: var(--surface2); }
+  .formation-school { font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold); letter-spacing: 0.1em; margin-bottom: .5rem; }
+  .formation-degree { font-size: 1.3rem; font-weight: 400; margin-bottom: .5rem; }
+  .formation-degree em { font-style: italic; color: var(--gold-light); }
+  .formation-period { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.08em; }
+
+  /* SKILLS */
+  #skills { background: var(--bg); }
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .skill-card { background: var(--bg); padding: 2.5rem; transition: background .3s; cursor: default; }
+  .skill-card:hover { background: var(--surface2); }
+  .skill-card-num { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.1em; margin-bottom: 1.5rem; }
+  .skill-card-title { font-size: 1.25rem; font-weight: 400; margin-bottom: 1.25rem; }
+  .skill-card-title em { font-style: italic; color: var(--gold-light); }
+  .skill-list { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+  .skill-list li { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.05em; display: flex; align-items: center; gap: .75rem; }
+  .skill-list li::before { content: ''; width: 4px; height: 4px; background: var(--gold); border-radius: 50%; opacity: 0.6; flex-shrink: 0; }
+  .skill-bar-wrap { margin-top: 1.5rem; }
+  .skill-bar-label { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-dim); letter-spacing: 0.08em; margin-bottom: .4rem; }
+  .skill-bar { height: 2px; background: var(--surface2); position: relative; overflow: hidden; }
+  .skill-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; background: linear-gradient(to right, var(--gold), var(--gold-light)); transform: scaleX(0); transform-origin: left; transition: transform 1.2s cubic-bezier(.4,0,.2,1); }
+  .skill-bar-fill.animated { transform: scaleX(1); }
+
+  /* PROJECTS */
+  #projects { background: var(--surface); }
+  .projects-list { display: flex; flex-direction: column; }
+  .project-item { border-top: 1px solid var(--border); padding: 2.5rem 0; display: grid; grid-template-columns: 3fr 1fr; gap: 3rem; align-items: start; cursor: pointer; transition: padding .3s; position: relative; }
+  .project-item:last-child { border-bottom: 1px solid var(--border); }
+  .project-item::after { content: ''; position: absolute; left: 0; bottom: 0; width: 0; height: 1px; background: var(--gold); transition: width .4s cubic-bezier(.4,0,.2,1); }
+  .project-item:hover::after { width: 100%; }
+  .project-item:hover { padding-left: 1rem; }
+  .project-meta { display: flex; gap: 1.5rem; align-items: center; margin-bottom: 1rem; }
+  .project-year { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; }
+  .project-type { font-family: var(--font-mono); font-size: 0.65rem; color: var(--gold); letter-spacing: 0.1em; border: 1px solid var(--border); padding: .2rem .6rem; }
+  .project-title { font-size: clamp(1.3rem, 2.5vw, 1.8rem); font-weight: 300; margin-bottom: .75rem; letter-spacing: -0.01em; transition: color .3s; }
+  .project-item:hover .project-title { color: var(--gold-light); }
+  .project-desc { color: var(--text-muted); font-size: 0.95rem; max-width: 500px; }
+  .project-stack { display: flex; flex-direction: column; gap: .5rem; align-items: flex-end; padding-top: 2.5rem; }
+  .stack-tag { font-family: var(--font-mono); font-size: 0.62rem; color: var(--text-dim); letter-spacing: 0.08em; }
+  .project-arrow { color: var(--gold); font-size: 1.2rem; opacity: 0; transition: opacity .3s, transform .3s; margin-top: auto; }
+  .project-item:hover .project-arrow { opacity: 1; transform: translateX(4px); }
+
+  /* CONTACT */
+  #contact { background: var(--bg); text-align: center; }
+  .contact-inner { max-width: 600px; margin: 0 auto; }
+  .contact-big { font-size: clamp(3rem, 7vw, 6rem); font-weight: 300; line-height: 1; margin-bottom: 2rem; letter-spacing: -0.02em; }
+  .contact-big em { font-style: italic; color: var(--gold-light); }
+  .contact-sub { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 3rem; }
+  .contact-email { font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.1em; color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--border); padding-bottom: .3rem; transition: border-color .3s; display: inline-block; margin-bottom: 1rem; }
+  .contact-email:hover { border-color: var(--gold); }
+  .contact-phone { display: block; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 3rem; }
+  .social-links { display: flex; gap: 2rem; justify-content: center; list-style: none; }
+  .social-links a { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; transition: color .3s; }
+  .social-links a:hover { color: var(--gold); }
+  footer { padding: 2rem 4rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.08em; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity .8s cubic-bezier(.4,0,.2,1), transform .8s cubic-bezier(.4,0,.2,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    nav { padding: 1.2rem 2rem; } section { padding: 5rem 2rem; }
+    #hero { padding: 0 2rem; } .hero-content { padding-left: 1.5rem; }
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; } .about-visual { max-width: 280px; }
+    .skills-grid, .formation-grid { grid-template-columns: 1fr; }
+    .timeline-item { grid-template-columns: 1fr; gap: .5rem; }
+    .project-item { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a href="#hero" class="nav-logo">KB</a>
+  <ul class="nav-links">
+    <li><a href="#about">Profil</a></li>
+    <li><a href="#experience">Expérience</a></li>
+    <li><a href="#formation">Formation</a></li>
+    <li><a href="#skills">Compétences</a></li>
+    <li><a href="#projects">Projets</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Développeur Full-Stack · UI/UX · Intelligence Artificielle</p>
+    <h1 class="hero-name">Kader<br><em>Babaro.</em></h1>
+    <p class="hero-title">Architecte de solutions numériques impactantes</p>
+    <p class="hero-desc">Développeur full-stack motivé, spécialisé en UI/UX et développement d'applications mobiles. Je construis des solutions digitales qui font la différence.</p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn-primary"><span>Voir mes projets</span></a>
+      <a href="#contact" class="hero-scroll"><span class="scroll-line"></span>Me contacter</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header reveal">
+    <span class="section-num">01</span>
+    <h2 class="section-title">À <em>propos</em></h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="about-grid">
+    <div class="about-visual reveal">
+      <div class="about-frame">
+        <div class="about-corner tl"></div>
+        <div class="about-corner br"></div>
+        <span class="about-frame-initials">KB</span>
+      </div>
+      <div class="about-badge">Disponible<br><span>2025</span></div>
+    </div>
+    <div class="about-text reveal">
+      <p>Développeur full-stack passionné, basé à <strong style="color:var(--text);font-weight:400">Niamey, Niger</strong>, je mets mes compétences en UI/UX et développement mobile au service de solutions numériques à fort impact.</p>
+      <p>Actuellement en Master en Intelligence Artificielle à l'ESCEP Niger, je combine une solide formation en génie logiciel avec une expérience terrain : projets ministériels, startups tech et mentorat de jeunes développeurs.</p>
+      <p>Mon objectif : créer des produits qui allient performance technique et expérience utilisateur soignée, pour contribuer à la transformation numérique du Niger.</p>
+      <div class="about-info">
+        <div class="about-info-row">
+          <span class="about-info-label">Localisation</span>
+          <span class="about-info-val">Niamey, Banifandou 2</span>
+        </div>
+        <div class="about-info-row">
+          <span class="about-info-label">Téléphone</span>
+          <span class="about-info-val">+227 91 05 09 89</span>
+        </div>
+        <div class="about-info-row">
+          <span class="about-info-label">Email</span>
+          <span class="about-info-val"><a href="mailto:kaderbabaro@gmail.com">kaderbabaro@gmail.com</a></span>
+        </div>
+      </div>
+      <div class="about-tags">
+        <span class="tag">React</span>
+        <span class="tag">Node.js</span>
+        <span class="tag">Flutter</span>
+        <span class="tag">UI/UX</span>
+        <span class="tag">Python</span>
+        <span class="tag">IA</span>
+        <span class="tag">Mobile</span>
+        <span class="tag">Full-Stack</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-header reveal">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Expé<em>rience</em></h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="timeline">
+    <div class="timeline-item reveal">
+      <div>
+        <p class="timeline-period">Juin 2025 — Août 2025</p>
+        <p class="timeline-company">Projet Ministère</p>
+      </div>
+      <div>
+        <h3 class="timeline-role">Développeur <em>Full-Stack</em></h3>
+        <ul class="timeline-list">
+          <li>Développement d'une application mobile pour les services de taxi, améliorant l'expérience utilisateur et l'accessibilité.</li>
+          <li>Collaboration avec le Ministère de l'Éducation sur des projets de transformation numérique.</li>
+          <li>Création de supports de formation pour le personnel éducatif sur l'utilisation des technologies.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div>
+        <p class="timeline-period">Juin 2024 — Présent</p>
+        <p class="timeline-company">Start-up Innovante en Technologie</p>
+      </div>
+      <div>
+        <h3 class="timeline-role">Développeur <em>Junior</em></h3>
+        <ul class="timeline-list">
+          <li>Contribution au développement front-end et back-end d'applications web.</li>
+          <li>Garantie de la qualité du code via des pratiques rigoureuses de test et de débogage.</li>
+          <li>Participation aux sprints de conception pour créer des produits numériques centrés sur l'utilisateur.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMATION -->
+<section id="formation">
+  <div class="section-header reveal">
+    <span class="section-num">03</span>
+    <h2 class="section-title">For<em>mation</em></h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="formation-grid reveal">
+    <div class="formation-card">
+      <p class="formation-school">ESCEP Niger</p>
+      <h3 class="formation-degree">Master en Intelligence <em>Artificielle</em></h3>
+      <p class="formation-period">Diplôme prévu en 2026</p>
+    </div>
+    <div class="formation-card">
+      <p class="formation-school">ESCEP Niger</p>
+      <h3 class="formation-degree">Licence en Génie <em>Logiciel</em></h3>
+      <p class="formation-period">2024 — 2026</p>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-header reveal">
+    <span class="section-num">04</span>
+    <h2 class="section-title"><em>Compétences</em></h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="skills-grid reveal">
+    <div class="skill-card">
+      <p class="skill-card-num">001</p>
+      <h3 class="skill-card-title">Développement <em>Front-end</em></h3>
+      <ul class="skill-list"><li>React / Next.js</li><li>HTML / CSS avancé</li><li>JavaScript / TypeScript</li><li>Design UI/UX</li></ul>
+      <div class="skill-bar-wrap"><div class="skill-bar-label"><span>Maîtrise</span><span>88%</span></div><div class="skill-bar"><div class="skill-bar-fill" style="width:88%"></div></div></div>
+    </div>
+    <div class="skill-card">
+      <p class="skill-card-num">002</p>
+      <h3 class="skill-card-title">Développement <em>Back-end</em></h3>
+      <ul class="skill-list"><li>Node.js / Express</li><li>Python</li><li>APIs REST</li><li>Bases de données</li></ul>
+      <div class="skill-bar-wrap"><div class="skill-bar-label"><span>Maîtrise</span><span>82%</span></div><div class="skill-bar"><div class="skill-bar-fill" style="width:82%"></div></div></div>
+    </div>
+    <div class="skill-card">
+      <p class="skill-card-num">003</p>
+      <h3 class="skill-card-title">Développement <em>Mobile</em></h3>
+      <ul class="skill-list"><li>Flutter / Dart</li><li>React Native</li><li>Android / iOS</li><li>UX Mobile</li></ul>
+      <div class="skill-bar-wrap"><div class="skill-bar-label"><span>Maîtrise</span><span>85%</span></div><div class="skill-bar"><div class="skill-bar-fill" style="width:85%"></div></div></div>
+    </div>
+    <div class="skill-card">
+      <p class="skill-card-num">004</p>
+      <h3 class="skill-card-title">Intelligence <em>Artificielle</em></h3>
+      <ul class="skill-list"><li>Machine Learning</li><li>Python / TensorFlow</li><li>Traitement de données</li><li>Modélisation IA</li></ul>
+      <div class="skill-bar-wrap"><div class="skill-bar-label"><span>Maîtrise</span><span>75%</span></div><div class="skill-bar"><div class="skill-bar-fill" style="width:75%"></div></div></div>
+    </div>
+    <div class="skill-card">
+      <p class="skill-card-num">005</p>
+      <h3 class="skill-card-title">Outils & <em>Méthodes</em></h3>
+      <ul class="skill-list"><li>Git / GitHub</li><li>Agile / Scrum</li><li>Tests & débogage</li><li>Docker</li></ul>
+      <div class="skill-bar-wrap"><div class="skill-bar-label"><span>Maîtrise</span><span>80%</span></div><div class="skill-bar"><div class="skill-bar-fill" style="width:80%"></div></div></div>
+    </div>
+    <div class="skill-card">
+      <p class="skill-card-num">006</p>
+      <h3 class="skill-card-title">Soft <em>Skills</em></h3>
+      <ul class="skill-list"><li>Communication claire</li><li>Travail en équipe</li><li>Mentorat & transmission</li><li>Autonomie & initiative</li></ul>
+      <div class="skill-bar-wrap"><div class="skill-bar-label"><span>Maîtrise</span><span>92%</span></div><div class="skill-bar"><div class="skill-bar-fill" style="width:92%"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header reveal">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Mes <em>projets</em></h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="projects-list">
+    <div class="project-item reveal">
+      <div>
+        <div class="project-meta"><span class="project-year">2025</span><span class="project-type">Application Mobile</span></div>
+        <h3 class="project-title">Application Mobile de Taxi</h3>
+        <p class="project-desc">Solution mobile développée dans le cadre d'un projet ministériel, facilitant la mise en relation entre chauffeurs et passagers à Niamey. Accent sur l'accessibilité et la fluidité de l'expérience utilisateur.</p>
+      </div>
+      <div class="project-stack"><span class="stack-tag">Flutter</span><span class="stack-tag">Node.js</span><span class="stack-tag">Maps API</span><span class="project-arrow">→</span></div>
+    </div>
+    <div class="project-item reveal">
+      <div>
+        <div class="project-meta"><span class="project-year">2024</span><span class="project-type">Numérique & Éducation</span></div>
+        <h3 class="project-title">Projet Ministère Numérique</h3>
+        <p class="project-desc">Collaboration sur un projet de transformation numérique de l'éducation au Niger. Développement d'outils pédagogiques et création de supports de formation pour le personnel éducatif.</p>
+      </div>
+      <div class="project-stack"><span class="stack-tag">React</span><span class="stack-tag">Python</span><span class="stack-tag">CMS</span><span class="project-arrow">→</span></div>
+    </div>
+    <div class="project-item reveal">
+      <div>
+        <div class="project-meta"><span class="project-year">2024</span><span class="project-type">Application Web</span></div>
+        <h3 class="project-title">Projets Start-up Tech</h3>
+        <p class="project-desc">Développement front-end et back-end d'applications web pour une start-up innovante. Participation active aux sprints de conception et aux processus de qualité logicielle.</p>
+      </div>
+      <div class="project-stack"><span class="stack-tag">React</span><span class="stack-tag">Node.js</span><span class="stack-tag">REST API</span><span class="project-arrow">→</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="reveal">
+      <p style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:.2em;color:var(--gold);margin-bottom:1.5rem;">06 — Contact</p>
+      <h2 class="contact-big">Travaillons<br><em>ensemble.</em></h2>
+      <p class="contact-sub">Disponible pour des projets freelance, un stage ou une opportunité professionnelle. N'hésitez pas à me contacter.</p>
+      <a href="mailto:kaderbabaro@gmail.com" class="contact-email">kaderbabaro@gmail.com</a>
+      <span class="contact-phone">+227 91 05 09 89</span>
+      <ul class="social-links">
+        <li><a href="#">GitHub</a></li>
+        <li><a href="#">LinkedIn</a></li>
+        <li><a href="tel:+22791050989">Téléphone</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2025 Kader Babaro</span>
+  <span>Développeur Full-Stack — Niamey, Niger</span>
+</footer>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{ mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px'; });
+  function animateRing(){ rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animateRing); }
+  animateRing();
+  document.querySelectorAll('a,button,.project-item,.skill-card,.timeline-item').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ cursor.style.width='14px';cursor.style.height='14px';ring.style.width='48px';ring.style.height='48px'; });
+    el.addEventListener('mouseleave',()=>{ cursor.style.width='8px';cursor.style.height='8px';ring.style.width='32px';ring.style.height='32px'; });
+  });
+  const reveals=document.querySelectorAll('.reveal');
+  const obs=new IntersectionObserver(entries=>{ entries.forEach((e,i)=>{ if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('visible'),i*80);obs.unobserve(e.target); } }); },{threshold:0.1,rootMargin:'0px 0px -60px 0px'});
+  reveals.forEach(el=>obs.observe(el));
+  const bars=document.querySelectorAll('.skill-bar-fill');
+  const barObs=new IntersectionObserver(entries=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('animated');barObs.unobserve(e.target); } }); },{threshold:0.5});
+  bars.forEach(b=>barObs.observe(b));
+</script>
+</body>
+</html>
